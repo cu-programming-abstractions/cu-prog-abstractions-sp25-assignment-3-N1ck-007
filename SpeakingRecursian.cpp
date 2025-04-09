@@ -1,14 +1,44 @@
 #include "SpeakingRecursian.h"
 using namespace std;
 
-Vector<string> allRecursianWords(int numSyllables) {
-    /* TODO: Delete this comment and the next few lines, then implement
-     * this function.
-     */
-    (void) numSyllables;
-    return { };
-}
+// Vowels: e i u
+// Consonants: b k n r s '
 
+Vector<string> allRecursianWords(int numSyllables) {
+    const Vector<string> vowels = {"e", "i", "u"};
+    const Vector<string> consonants = {"b", "k", "n", "r", "s", "'"};
+
+    if (numSyllables < 0) {
+        error("Invalid number of syllables");
+    }
+
+
+    if (numSyllables == 0) {
+        return {""};
+    }
+
+    Vector<string> result;
+    Vector<string> smallerWords = allRecursianWords(numSyllables - 1);
+
+
+    if (smallerWords[0] == "") {
+        for (const string& vowel : vowels) {
+            result.add(vowel);
+        }
+    }
+
+
+    for (const string& consonant : consonants) {
+        for (const string& vowel : vowels) {
+            string syllable = consonant + vowel;
+            for (const string& word : smallerWords) {
+                result.add(word + syllable);
+            }
+        }
+    }
+
+    return result;
+}
 
 /* * * * * Test Cases Below This Point * * * * */
 #include "GUI/SimpleTest.h"
@@ -80,4 +110,11 @@ PROVIDED_TEST("allRecursianWords produces words consisting of consonants and vow
             EXPECT(isConsonant(ch) || isVowel(ch));
         }
     }
+}
+
+STUDENT_TEST("AllRecursianWords - Large syllables count") {
+    // Test for 5 syllables
+    Vector<string> words = allRecursianWords(5);
+
+    EXPECT_EQUAL(words.size(), 2204496);
 }

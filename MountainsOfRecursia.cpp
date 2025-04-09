@@ -1,18 +1,67 @@
 #include "MountainsOfRecursia.h"
+#include "random.h"
 using namespace std;
+
+bool isInVector(const Point& point, Vector<Point> vector)
+{
+    for (Point elem : vector) {
+        if (point == elem)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 Vector<Point> makeMountainRange(const Point& left,
                                 const Point& right,
                                 int amplitude,
                                 double decayRate) {
-    /* TODO: Delete this comment and the next few lines, then implement this
-     * function.
-     */
-    (void) left;
-    (void) right;
-    (void) amplitude;
-    (void) decayRate;
-    return { };
+
+    Vector <Point> points;
+    points.add(left);
+
+    //Error handling
+    if (left.x > right.x)
+    {
+        error("The left point is to the right of the right point");
+    }
+    if (amplitude < 0)
+    {
+        error("The amplitude value is negative");
+    }
+    if ((decayRate < 0) || (decayRate > 1))
+    {
+        error("The decayRate parameter is negative or greater than one");
+    }
+
+    //points += midpointRange(left, right, amplitude, decayRate);
+
+    if (!((right.x - left.x) <= 3))
+    {
+        //calculate midpoint
+        Point midpoint;
+        midpoint.x = (left.x + right.x) / 2;
+        midpoint.y = ((left.y + right.y) / 2) + randomInteger(-amplitude, amplitude);
+
+        //left range
+        auto leftRange = makeMountainRange(left, midpoint, amplitude * decayRate, decayRate);
+        //right range
+        auto rightRange = makeMountainRange(midpoint, right, amplitude * decayRate, decayRate);
+
+        //add elements (avoid duplicate left points)
+        points += leftRange.subList(1, leftRange.size() - 1);
+        points += rightRange.subList(1, rightRange.size() - 1);
+
+    }
+
+    if (!(isInVector(right, points)))
+    {
+        points.add(right);
+    }
+
+    return points;
 }
 
 /* * * * * Test Cases Below This Point * * * * */
